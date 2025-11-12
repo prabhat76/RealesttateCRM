@@ -81,7 +81,7 @@ export class AuthService {
         
         // Check password - in production, this would be done server-side with hashing
         const validPassword = 
-          (credentials.email === 'superadmin@novakeys.com' && credentials.password === 'admin123') ||
+          (credentials.email === 'superadmin@novakeys.com' && credentials.password === 'superadmin') ||
           (credentials.email !== 'superadmin@novakeys.com' && credentials.password === 'password123');
         
         if (user && validPassword) {
@@ -191,6 +191,12 @@ export class AuthService {
 
   isAuthenticated(): boolean {
     return this.currentUserValue !== null && this.isSessionValid();
+  }
+
+  getToken(): string | null {
+    return this.storageService.getItem<string>(this.SESSION_KEY, {
+      type: StorageType.SESSION
+    });
   }
 
   refreshSession(): void {
