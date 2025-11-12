@@ -1,0 +1,50 @@
+<div class="sidebar">
+  <div class="logo">
+    <h2>🏡 Propella CRM</h2>
+  </div>
+  
+  <nav class="nav-menu">
+    <div 
+      class="nav-item" 
+      [class.active]="isActive('/dashboard')"
+      (click)="navigate('/dashboard')"
+    >
+      <i class="fas fa-home"></i>
+      <span>Dashboard</span>
+    </div>
+    
+    <div 
+      class="nav-item" 
+      [class.active]="isActive('/buy')"
+      (click)="navigate('/buy')"
+    >
+      <i class="fas fa-shopping-cart"></i>
+      <span>Buy Property</span>
+    </div>
+    
+    <div 
+      class="nav-item" 
+      [class.active]="isActive('/sell')"
+      (click)="navigate('/sell')"
+    >
+      <i class="fas fa-tag"></i>
+      <span>Sell Property</span>
+    </div>
+    
+    <div 
+      class="nav-item" 
+      [class.active]="isActive('/mortgage')"
+      (click)="navigate('/mortgage')"
+    >
+      <i class="fas fa-calculator"></i>
+      <span>Mortgage</span>
+    </div>
+    
+    <div class="nav-divider"></div>
+    
+    <div class="nav-item" (click)="logout()">
+      <i class="fas fa-sign-out-alt"></i>
+      <span>Logout</span>
+    </div>
+  </nav>
+</div>

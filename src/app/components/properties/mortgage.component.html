@@ -1,0 +1,159 @@
+<div class="mortgage-container">
+  <div class="page-header">
+    <h1>Mortgage Calculator</h1>
+    <p>Calculate your monthly payments and apply for pre-approval</p>
+  </div>
+
+  <div class="mortgage-grid">
+    <div class="calculator-card">
+      <h2>Calculate Your Mortgage</h2>
+      
+      <form (ngSubmit)="calculateMortgage()" #mortgageForm="ngForm">
+        <div class="form-group">
+          <label for="propertyPrice">
+            Property Price ($)
+            <span class="required">*</span>
+          </label>
+          <input
+            type="number"
+            id="propertyPrice"
+            name="propertyPrice"
+            [(ngModel)]="mortgageData.propertyPrice"
+            (input)="calculateMortgage()"
+            required
+            min="0"
+            placeholder="450000"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="downPayment">
+            Down Payment ($)
+            <span class="hint">{{ downPaymentPercentage.toFixed(1) }}%</span>
+          </label>
+          <input
+            type="number"
+            id="downPayment"
+            name="downPayment"
+            [(ngModel)]="mortgageData.downPayment"
+            (input)="calculateMortgage()"
+            required
+            min="0"
+            [max]="mortgageData.propertyPrice"
+            placeholder="90000"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="interestRate">
+            Interest Rate (%)
+            <span class="hint">Annual</span>
+          </label>
+          <input
+            type="number"
+            id="interestRate"
+            name="interestRate"
+            [(ngModel)]="mortgageData.interestRate"
+            (input)="calculateMortgage()"
+            required
+            min="0"
+            max="20"
+            step="0.1"
+            placeholder="4.5"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="loanTerm">Loan Term (Years)</label>
+          <select
+            id="loanTerm"
+            name="loanTerm"
+            [(ngModel)]="mortgageData.loanTerm"
+            (change)="calculateMortgage()"
+            required
+          >
+            <option value="15">15 years</option>
+            <option value="20">20 years</option>
+            <option value="30">30 years</option>
+          </select>
+        </div>
+
+        <button type="button" class="btn-secondary" (click)="resetCalculator()">
+          Reset
+        </button>
+      </form>
+    </div>
+
+    <div class="results-card">
+      <h2>Payment Breakdown</h2>
+      
+      <div class="result-item highlight">
+        <div class="result-label">Monthly Payment</div>
+        <div class="result-value">
+          ${{ calculatedResults.monthlyPayment.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) }}
+        </div>
+      </div>
+
+      <div class="result-item">
+        <div class="result-label">Loan Amount</div>
+        <div class="result-value">
+          ${{ calculatedResults.loanAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) }}
+        </div>
+      </div>
+
+      <div class="result-item">
+        <div class="result-label">Total Payment</div>
+        <div class="result-value">
+          ${{ calculatedResults.totalPayment.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) }}
+        </div>
+      </div>
+
+      <div class="result-item">
+        <div class="result-label">Total Interest</div>
+        <div class="result-value">
+          ${{ calculatedResults.totalInterest.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) }}
+        </div>
+      </div>
+
+      <button 
+        class="btn-primary btn-apply" 
+        (click)="applyForMortgage()"
+        [disabled]="calculatedResults.monthlyPayment === 0 || loading"
+      >
+        {{ loading ? 'Submitting...' : 'Apply for Pre-Approval' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="info-section">
+    <div class="info-card">
+      <h3>📊 Understanding Your Mortgage</h3>
+      <p><strong>Principal:</strong> The loan amount you borrow</p>
+      <p><strong>Interest Rate:</strong> The cost of borrowing, expressed as a percentage</p>
+      <p><strong>Loan Term:</strong> The time period to repay the loan</p>
+      <p><strong>Down Payment:</strong> Upfront payment, typically 10-20% of property price</p>
+    </div>
+
+    <div class="info-card">
+      <h3>✅ Pre-Approval Benefits</h3>
+      <ul>
+        <li>Know your budget before house hunting</li>
+        <li>Strengthen your offer to sellers</li>
+        <li>Lock in interest rates</li>
+        <li>Speed up the closing process</li>
+        <li>Identify potential issues early</li>
+      </ul>
+    </div>
+
+    <div class="info-card">
+      <h3>📝 Required Documents</h3>
+      <ul>
+        <li>Proof of income (pay stubs, tax returns)</li>
+        <li>Employment verification</li>
+        <li>Bank statements</li>
+        <li>Credit report</li>
+        <li>Photo identification</li>
+      </ul>
+    </div>
+  </div>
+</div>

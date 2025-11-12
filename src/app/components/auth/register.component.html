@@ -1,0 +1,126 @@
+<div class="register-container">
+  <div class="register-card">
+    <div class="register-header">
+      <h1>Propella Real Estate CRM</h1>
+      <h2>Create Account</h2>
+      <p>Join our property management platform</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input
+            type="text"
+            id="firstName"
+            name="firstName"
+            [(ngModel)]="registerData.firstName"
+            required
+            placeholder="John"
+            [disabled]="loading"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input
+            type="text"
+            id="lastName"
+            name="lastName"
+            [(ngModel)]="registerData.lastName"
+            required
+            placeholder="Doe"
+            [disabled]="loading"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          [(ngModel)]="registerData.email"
+          required
+          email
+          placeholder="john.doe@example.com"
+          [disabled]="loading"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Phone Number (Optional)</label>
+        <input
+          type="tel"
+          id="phone"
+          name="phone"
+          [(ngModel)]="registerData.phone"
+          placeholder="555-0100"
+          [disabled]="loading"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="role">I am a</label>
+        <select
+          id="role"
+          name="role"
+          [(ngModel)]="registerData.role"
+          required
+          [disabled]="loading"
+        >
+          <option value="buyer">Buyer</option>
+          <option value="seller">Seller</option>
+          <option value="agent">Agent</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            [(ngModel)]="registerData.password"
+            required
+            minlength="6"
+            placeholder="Min 6 characters"
+            [disabled]="loading"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            [(ngModel)]="confirmPassword"
+            required
+            minlength="6"
+            placeholder="Confirm password"
+            [disabled]="loading"
+          />
+        </div>
+      </div>
+
+      <div class="error-message" *ngIf="error">
+        {{ error }}
+      </div>
+
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="!registerForm.form.valid || loading"
+      >
+        {{ loading ? 'Creating Account...' : 'Create Account' }}
+      </button>
+    </form>
+
+    <div class="register-footer">
+      <p>Already have an account? <a routerLink="/login">Sign in here</a></p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,233 @@
+<div class="sell-property-container">
+  <div class="page-header">
+    <h1>List Your Property</h1>
+    <p>Sell or rent your property with our expert assistance</p>
+  </div>
+
+  <div class="form-card">
+    <form (ngSubmit)="onSubmit()" #sellForm="ngForm">
+      <div class="form-section">
+        <h2>Property Details</h2>
+        
+        <div class="form-group">
+          <label for="title">Property Title *</label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            [(ngModel)]="propertyData.title"
+            required
+            placeholder="e.g., Luxury 3BR Apartment in Downtown"
+            [disabled]="loading"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description *</label>
+          <textarea
+            id="description"
+            name="description"
+            [(ngModel)]="propertyData.description"
+            required
+            rows="4"
+            placeholder="Describe your property, its features, and nearby amenities..."
+            [disabled]="loading"
+          ></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="type">Property Type *</label>
+            <select
+              id="type"
+              name="type"
+              [(ngModel)]="propertyData.type"
+              required
+              [disabled]="loading"
+            >
+              <option value="apartment">Apartment</option>
+              <option value="house">House</option>
+              <option value="condo">Condo</option>
+              <option value="land">Land</option>
+              <option value="commercial">Commercial</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="status">Listing Type *</label>
+            <select
+              id="status"
+              name="status"
+              [(ngModel)]="propertyData.status"
+              required
+              [disabled]="loading"
+            >
+              <option value="for-sale">For Sale</option>
+              <option value="for-rent">For Rent</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="price">Price ($) *</label>
+            <input
+              type="number"
+              id="price"
+              name="price"
+              [(ngModel)]="propertyData.price"
+              required
+              min="0"
+              placeholder="0"
+              [disabled]="loading"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h2>Location</h2>
+        
+        <div class="form-group">
+          <label for="address">Street Address *</label>
+          <input
+            type="text"
+            id="address"
+            name="address"
+            [(ngModel)]="propertyData.address"
+            required
+            placeholder="123 Main Street"
+            [disabled]="loading"
+          />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="city">City *</label>
+            <input
+              type="text"
+              id="city"
+              name="city"
+              [(ngModel)]="propertyData.city"
+              required
+              placeholder="New York"
+              [disabled]="loading"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="state">State *</label>
+            <input
+              type="text"
+              id="state"
+              name="state"
+              [(ngModel)]="propertyData.state"
+              required
+              placeholder="NY"
+              maxlength="2"
+              [disabled]="loading"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="zipCode">ZIP Code *</label>
+            <input
+              type="text"
+              id="zipCode"
+              name="zipCode"
+              [(ngModel)]="propertyData.zipCode"
+              required
+              placeholder="10001"
+              [disabled]="loading"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h2>Property Specifications</h2>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="bedrooms">Bedrooms</label>
+            <input
+              type="number"
+              id="bedrooms"
+              name="bedrooms"
+              [(ngModel)]="propertyData.bedrooms"
+              min="0"
+              placeholder="0"
+              [disabled]="loading"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="bathrooms">Bathrooms</label>
+            <input
+              type="number"
+              id="bathrooms"
+              name="bathrooms"
+              [(ngModel)]="propertyData.bathrooms"
+              min="0"
+              step="0.5"
+              placeholder="0"
+              [disabled]="loading"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="area">Area (sqft) *</label>
+            <input
+              type="number"
+              id="area"
+              name="area"
+              [(ngModel)]="propertyData.area"
+              required
+              min="0"
+              placeholder="0"
+              [disabled]="loading"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn-secondary"
+          (click)="resetForm()"
+          [disabled]="loading"
+        >
+          Reset
+        </button>
+        <button
+          type="submit"
+          class="btn-primary"
+          [disabled]="!sellForm.form.valid || loading"
+        >
+          {{ loading ? 'Submitting...' : 'List Property' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="info-section">
+    <div class="info-card">
+      <h3>📝 How It Works</h3>
+      <ol>
+        <li>Fill out the property details form</li>
+        <li>Our team reviews your listing</li>
+        <li>Professional photos and marketing</li>
+        <li>Connect with qualified buyers</li>
+      </ol>
+    </div>
+
+    <div class="info-card">
+      <h3>💰 Why List With Us</h3>
+      <ul>
+        <li>Expert market analysis</li>
+        <li>Professional photography</li>
+        <li>Maximum exposure</li>
+        <li>Dedicated agent support</li>
+      </ul>
+    </div>
+  </div>
+</div>

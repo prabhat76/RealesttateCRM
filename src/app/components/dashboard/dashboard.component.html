@@ -1,0 +1,71 @@
+<div class="dashboard">
+  <div class="dashboard-header">
+    <h1>Dashboard Overview</h1>
+    <p>Welcome to your real estate CRM</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card" *ngFor="let stat of stats">
+      <div class="stat-icon" [style.background-color]="stat.color">
+        <i [class]="stat.icon"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{stat.value}}</h3>
+        <p>{{stat.label}}</p>
+        <span class="stat-change" [class.positive]="stat.change > 0" [class.negative]="stat.change < 0">
+          <i [class]="stat.change > 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down'"></i>
+          {{Math.abs(stat.change)}}%
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="properties-section">
+      <div class="section-header">
+        <h2>Recent Properties</h2>
+      </div>
+      
+      <div class="properties-list">
+        <div class="property-card" *ngFor="let property of properties">
+          <img [src]="property.image" [alt]="property.title">
+          <div class="property-info">
+            <h3>{{property.title}}</h3>
+            <p class="property-location">
+              <i class="fas fa-map-marker-alt"></i>
+              {{property.location}}
+            </p>
+            <div class="property-details">
+              <span class="price">${{property.price | number}}</span>
+              <span class="type">{{property.type}}</span>
+            </div>
+            <div class="property-features">
+              <span><i class="fas fa-bed"></i> {{property.beds}}</span>
+              <span><i class="fas fa-bath"></i> {{property.baths}}</span>
+              <span><i class="fas fa-ruler-combined"></i> {{property.sqft}} sqft</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="leads-section">
+      <div class="section-header">
+        <h2>Recent Leads</h2>
+      </div>
+      
+      <div class="leads-list">
+        <div class="lead-item" *ngFor="let lead of leads">
+          <div class="lead-avatar">
+            <img [src]="lead.avatar" [alt]="lead.name">
+          </div>
+          <div class="lead-info">
+            <h4>{{lead.name}}</h4>
+            <p>{{lead.email}}</p>
+            <span class="lead-status" [class]="lead.status.toLowerCase()">{{lead.status}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

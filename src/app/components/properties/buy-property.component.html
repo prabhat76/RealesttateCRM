@@ -1,0 +1,84 @@
+<div class="buy-property-container">
+  <div class="page-header">
+    <h1>Browse Properties for Sale</h1>
+    <p>Find your dream home from our curated listings</p>
+  </div>
+
+  <div class="filters-section">
+    <div class="filter-group">
+      <input
+        type="text"
+        placeholder="Search by location or property name..."
+        [(ngModel)]="searchTerm"
+        (input)="filterProperties()"
+        class="search-input"
+      />
+    </div>
+
+    <div class="filter-row">
+      <div class="filter-group">
+        <label>Property Type</label>
+        <select [(ngModel)]="selectedType" (change)="filterProperties()">
+          <option value="all">All Types</option>
+          <option value="apartment">Apartment</option>
+          <option value="house">House</option>
+          <option value="condo">Condo</option>
+          <option value="land">Land</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Min Price</label>
+        <input
+          type="number"
+          [(ngModel)]="minPrice"
+          (change)="filterProperties()"
+          placeholder="Min"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label>Max Price</label>
+        <input
+          type="number"
+          [(ngModel)]="maxPrice"
+          (change)="filterProperties()"
+          placeholder="Max"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="properties-grid">
+    <div class="property-card" *ngFor="let property of filteredProperties">
+      <div class="property-image">
+        <img [src]="property.images[0]" [alt]="property.title" />
+        <div class="property-badge">{{ property.type | titlecase }}</div>
+      </div>
+      
+      <div class="property-details">
+        <h3>{{ property.title }}</h3>
+        <p class="property-location">📍 {{ property.city }}, {{ property.state }}</p>
+        <p class="property-description">{{ property.description }}</p>
+        
+        <div class="property-specs">
+          <span *ngIf="property.bedrooms">🛏️ {{ property.bedrooms }} Beds</span>
+          <span *ngIf="property.bathrooms">🚿 {{ property.bathrooms }} Baths</span>
+          <span>📏 {{ property.area }} sqft</span>
+        </div>
+        
+        <div class="property-footer">
+          <div class="property-price">${{ property.price.toLocaleString() }}</div>
+          <div class="property-actions">
+            <button class="btn-secondary" (click)="viewProperty(property)">View Details</button>
+            <button class="btn-primary" (click)="scheduleViewing(property)">Schedule Viewing</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="no-results" *ngIf="filteredProperties.length === 0">
+    <p>No properties found matching your criteria.</p>
+  </div>
+</div>

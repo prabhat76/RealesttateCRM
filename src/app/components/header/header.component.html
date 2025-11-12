@@ -1,0 +1,25 @@
+<header class="header">
+  <div class="header-content">
+    <div class="search-section">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="Search properties, transactions...">
+      </div>
+    </div>
+    
+    <div class="header-actions">
+      <div class="notifications">
+        <i class="fas fa-bell"></i>
+        <span class="badge">3</span>
+      </div>
+      
+      <div class="user-profile">
+        <img src="https://via.placeholder.com/36x36" [alt]="currentUser?.firstName">
+        <div class="user-info">
+          <span class="user-name">{{ currentUser?.firstName }} {{ currentUser?.lastName }}</span>
+          <span class="user-role">{{ currentUser?.role | titlecase }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
