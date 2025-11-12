@@ -4,6 +4,9 @@
   box-sizing: border-box;
 }
 
+/* Import Angular Material theme */
+@import './styles-material.scss';
+
 :root {
   --primary-maroon: #8B0000;
   --primary-gold: #D4AF37;
@@ -12,12 +15,21 @@
   --text-dark: #2d0000;
   --text-light: #666;
   --bg-light: #faf9f7;
+  
+  /* Brand variables (can be overridden by tenant) */
+  --brand-primary: #8B0000;
+  --brand-secondary: #D4AF37;
+}
+
+html, body {
+  height: 100%;
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   background-color: var(--bg-light);
   color: var(--text-dark);
+  margin: 0;
 }
 
 .btn {

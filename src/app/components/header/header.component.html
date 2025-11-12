@@ -1,5 +1,30 @@
 <header class="header">
   <div class="header-content">
+    <!-- Tenant Indicator (Superadmin only) -->
+    <div class="tenant-indicator" *ngIf="isSuperadmin && currentTenant">
+      <div class="tenant-badge" (click)="toggleTenantSwitcher()">
+        <div class="tenant-color" [style.background-color]="currentTenant.branding.primaryColor"></div>
+        <div class="tenant-details">
+          <span class="tenant-name">👁️ {{currentTenant.branding.companyName}}</span>
+          <span class="tenant-slug">{{currentTenant.slug}}</span>
+        </div>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      
+      <!-- Quick Actions Dropdown -->
+      <div class="tenant-actions-dropdown" *ngIf="showTenantSwitcher" (click)="$event.stopPropagation()">
+        <button (click)="goToSuperadmin(); showTenantSwitcher = false" class="action-btn">
+          <i class="fas fa-crown"></i> Back to Superadmin
+        </button>
+        <div class="dropdown-divider"></div>
+        <div class="tenant-info-section">
+          <p><strong>Status:</strong> {{currentTenant.status}}</p>
+          <p><strong>Plan:</strong> {{currentTenant.subscriptionPlan}}</p>
+          <p><strong>Owner:</strong> {{currentTenant.ownerEmail}}</p>
+        </div>
+      </div>
+    </div>
+    
     <div class="search-section">
       <div class="search-box">
         <i class="fas fa-search"></i>

@@ -8,6 +8,7 @@ import { MortgageComponent } from './components/properties/mortgage.component';
 import { LeadsComponent } from './components/leads/leads.component';
 import { SuperadminComponent } from './components/superadmin/superadmin.component';
 import { TenantSettingsComponent } from './components/tenant-settings/tenant-settings.component';
+import { AnalyticsDashboardComponent } from './components/analytics-dashboard/analytics-dashboard.component';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -46,6 +47,11 @@ export const routes: Routes = [
   { 
     path: 'settings', 
     component: TenantSettingsComponent,
+    canActivate: [authGuard]
+  },
+  { 
+    path: 'analytics', 
+    component: AnalyticsDashboardComponent,
     canActivate: [authGuard]
   },
   { path: '', redirectTo: '/login', pathMatch: 'full' },

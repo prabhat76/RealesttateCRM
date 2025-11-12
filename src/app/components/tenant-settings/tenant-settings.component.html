@@ -6,9 +6,9 @@
   
   <div class="settings-tabs">
     <button 
-      *ngFor="let tab of ['branding', 'features', 'customFields', 'forms', 'email', 'integrations']"
+      *ngFor="let tab of tabs"
       [class.active]="activeTab === tab"
-      (click)="activeTab = tab">
+      (click)="setActiveTab(tab)">
       {{tab | titlecase}}
     </button>
   </div>

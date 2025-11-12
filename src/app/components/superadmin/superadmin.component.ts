@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { SuperadminService } from '../../services/superadmin.service';
+import { TenantResolverService } from '../../services/tenant-resolver.service';
 import { TenantInstance, PlatformStats, PLAN_TEMPLATES, PlanTemplate } from '../../models/tenant.model';
 
 @Component({
@@ -35,6 +36,7 @@ export class SuperadminComponent implements OnInit {
 
   constructor(
     private superadminService: SuperadminService,
+    private tenantResolver: TenantResolverService,
     private router: Router
   ) {}
 
@@ -97,10 +99,20 @@ export class SuperadminComponent implements OnInit {
       }
       
       this.newTenant.branding!.companyName = this.newTenant.name;
-      this.superadminService.createTenant(this.newTenant);
+      const createdTenant = this.superadminService.createTenant(this.newTenant);
+      
       this.closeCreateModal();
       this.loadTenants();
       this.loadStats();
+      
+      // Show success message with navigation options
+      if (confirm(`✅ Tenant "${createdTenant.name}" created successfully!\n\n` +
+                  `Slug: ${createdTenant.slug}\n` +
+                  `Status: ${createdTenant.status}\n` +
+                  `Trial ends: ${createdTenant.trialEndsAt?.toLocaleDateString()}\n\n` +
+                  `Would you like to preview this tenant now?`)) {
+        this.previewTenant(createdTenant);
+      }
     }
   }
 
@@ -204,5 +216,57 @@ export class SuperadminComponent implements OnInit {
     const g = Math.max(0, Math.min(255, ((num >> 8) & 0x00FF) + amount));
     const b = Math.max(0, Math.min(255, (num & 0x0000FF) + amount));
     return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+  }
+
+  /**
+   * Preview tenant - Switch to tenant context
+   */
+  previewTenant(tenant: TenantInstance): void {
+    const success = this.tenantResolver.switchTenant(tenant.slug);
+    if (success) {
+      // Navigate to dashboard to see tenant branding
+      this.router.navigate(['/dashboard']);
+      
+      // Show info about how to return
+      setTimeout(() => {
+        alert(`👀 Now viewing: ${tenant.branding.companyName}\n\n` +
+              `You are previewing this tenant instance with their branding and features.\n\n` +
+              `To return to superadmin:\n` +
+              `1. Navigate to /superadmin\n` +
+              `2. Or click the tenant switcher in the header`);
+      }, 500);
+    } else {
+      alert('Failed to switch to tenant. Please try again.');
+    }
+  }
+
+  /**
+   * Copy tenant URL for sharing
+   */
+  copyTenantUrl(tenant: TenantInstance): void {
+    const baseUrl = window.location.origin;
+    const tenantUrl = `${baseUrl}?tenant=${tenant.slug}`;
+    
+    navigator.clipboard.writeText(tenantUrl).then(() => {
+      alert(`📋 Copied to clipboard:\n${tenantUrl}\n\nShare this URL with the tenant owner.`);
+    }).catch(() => {
+      // Fallback for older browsers
+      const textarea = document.createElement('textarea');
+      textarea.value = tenantUrl;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      alert(`📋 Copied to clipboard:\n${tenantUrl}`);
+    });
+  }
+
+  /**
+   * Open tenant in new tab
+   */
+  openTenantInNewTab(tenant: TenantInstance): void {
+    const baseUrl = window.location.origin;
+    const tenantUrl = `${baseUrl}?tenant=${tenant.slug}`;
+    window.open(tenantUrl, '_blank');
   }
 }

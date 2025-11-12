@@ -458,6 +458,8 @@
 .btn-warning { background: #f59e0b; color: white; }
 .btn-info { background: #3b82f6; color: white; }
 .btn-danger { background: #ef4444; color: white; }
+.btn-primary { background: #8B0000; color: white; }
+.btn-secondary { background: #64748b; color: white; }
 
 .btn-sm:hover { transform: translateY(-1px); opacity: 0.9; }
 

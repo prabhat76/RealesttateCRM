@@ -79,6 +79,15 @@
       <span>Tenant Settings</span>
     </div>
     
+    <div 
+      class="nav-item" 
+      [class.active]="isActive('/analytics')"
+      (click)="navigate('/analytics')"
+    >
+      <i class="fas fa-chart-line"></i>
+      <span>Analytics</span>
+    </div>
+    
     <div class="nav-divider"></div>
     
     <div class="nav-item" (click)="logout()">

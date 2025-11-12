@@ -194,14 +194,20 @@
           <span class="revenue-amount">{{formatCurrency(tenant.monthlyRevenue)}}</span>
         </div>
         <div class="tenant-actions" (click)="$event.stopPropagation()">
+          <button class="btn-sm btn-primary" (click)="previewTenant(tenant)" title="Preview tenant with their branding">
+            <i class="fas fa-eye"></i> Preview
+          </button>
+          <button class="btn-sm btn-secondary" (click)="copyTenantUrl(tenant)" title="Copy tenant URL">
+            <i class="fas fa-link"></i> Copy URL
+          </button>
+          <button class="btn-sm btn-info" (click)="openTenantInNewTab(tenant)" title="Open in new tab">
+            <i class="fas fa-external-link-alt"></i> Open
+          </button>
           <button class="btn-sm btn-success" *ngIf="tenant.status === 'suspended'" (click)="activateTenant(tenant.id)">
             <i class="fas fa-play"></i> Activate
           </button>
           <button class="btn-sm btn-warning" *ngIf="tenant.status === 'active'" (click)="suspendTenant(tenant.id)">
             <i class="fas fa-pause"></i> Suspend
-          </button>
-          <button class="btn-sm btn-info">
-            <i class="fas fa-eye"></i> View
           </button>
         </div>
       </div>

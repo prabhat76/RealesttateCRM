@@ -13,9 +13,158 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  gap: 20px;
 }
 
-.search-box {
+/* Tenant Indicator */
+.tenant-indicator {
+  position: relative;
+  min-width: 250px;
+}
+
+.tenant-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.tenant-badge:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+
+.tenant-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(139, 0, 0, 0.1);
+  }
+}
+
+.tenant-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.tenant-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tenant-slug {
+  font-size: 11px;
+  color: #64748b;
+  font-family: 'Courier New', monospace;
+}
+
+.tenant-badge i {
+  color: #64748b;
+  font-size: 12px;
+  transition: transform 0.3s;
+}
+
+.tenant-badge:hover i {
+  transform: translateY(2px);
+}
+
+/* Tenant Actions Dropdown */
+.tenant-actions-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  border: 1px solid #e2e8f0;
+  min-width: 280px;
+  z-index: 1000;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.action-btn {
+  width: 100%;
+  padding: 14px 18px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s;
+  border-radius: 10px 10px 0 0;
+}
+
+.action-btn:hover {
+  background: #f8fafc;
+  color: #8B0000;
+}
+
+.action-btn i {
+  color: #8B0000;
+  font-size: 16px;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 0;
+}
+
+.tenant-info-section {
+  padding: 16px 18px;
+  background: #f8fafc;
+  border-radius: 0 0 10px 10px;
+}
+
+.tenant-info-section p {
+  margin: 6px 0;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.tenant-info-section strong {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.search-section {
   position: relative;
   width: 450px;
 }
@@ -121,7 +270,11 @@
 }
 
 @media (max-width: 768px) {
-  .search-box {
+  .search-section {
+  flex: 1;
+}
+
+.search-box {
     width: 250px;
   }
   

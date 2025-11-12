@@ -1,0 +1,217 @@
+<div class="analytics-dashboard">
+  <div class="dashboard-header">
+    <h1>📊 Analytics Dashboard</h1>
+    <div class="header-actions">
+      <select [(ngModel)]="dateRange" (change)="changeDateRange(dateRange)" class="filter-select">
+        <option value="week">Last Week</option>
+        <option value="month">Last Month</option>
+        <option value="quarter">Last Quarter</option>
+        <option value="year">Last Year</option>
+      </select>
+      <button class="btn-refresh" (click)="refreshData()">🔄 Refresh</button>
+      <div class="export-dropdown">
+        <button class="btn-export">📥 Export ▼</button>
+        <div class="dropdown-content">
+          <a (click)="exportData('csv')">Export as CSV</a>
+          <a (click)="exportData('excel')">Export as Excel</a>
+          <a (click)="exportData('pdf')">Export as PDF</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon">📋</div>
+      <div class="kpi-content">
+        <h3>{{totalLeads}}</h3>
+        <p>Total Leads</p>
+        <span class="kpi-trend positive">+12% from last period</span>
+      </div>
+    </div>
+    
+    <div class="kpi-card">
+      <div class="kpi-icon">✅</div>
+      <div class="kpi-content">
+        <h3>{{qualifiedLeads}}</h3>
+        <p>Qualified Leads</p>
+        <span class="kpi-trend positive">+8% from last period</span>
+      </div>
+    </div>
+    
+    <div class="kpi-card">
+      <div class="kpi-icon">🎯</div>
+      <div class="kpi-content">
+        <h3>{{conversionRate}}%</h3>
+        <p>Conversion Rate</p>
+        <span class="kpi-trend negative">-2% from last period</span>
+      </div>
+    </div>
+    
+    <div class="kpi-card">
+      <div class="kpi-icon">⏱️</div>
+      <div class="kpi-content">
+        <h3>{{averageResponseTime}}</h3>
+        <p>Avg Response Time</p>
+        <span class="kpi-trend positive">-15% from last period</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Grid -->
+  <div class="charts-grid">
+    <!-- Lead Sources Pie Chart -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>📍 Lead Sources</h3>
+        <button class="btn-chart-expand">⛶</button>
+      </div>
+      <div class="chart-container">
+        <div #leadSourceChart class="chart"></div>
+      </div>
+    </div>
+
+    <!-- Status Bar Chart -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>📈 Lead Status Distribution</h3>
+        <button class="btn-chart-expand">⛶</button>
+      </div>
+      <div class="chart-container">
+        <div #statusChart class="chart"></div>
+      </div>
+    </div>
+
+    <!-- Trend Line Chart -->
+    <div class="chart-card full-width">
+      <div class="chart-header">
+        <h3>📉 Lead Trend (Last 30 Days)</h3>
+        <div class="metric-selector">
+          <button 
+            [class.active]="selectedMetric === 'leads'"
+            (click)="selectedMetric = 'leads'">
+            Leads
+          </button>
+          <button 
+            [class.active]="selectedMetric === 'conversion'"
+            (click)="selectedMetric = 'conversion'">
+            Conversion
+          </button>
+          <button 
+            [class.active]="selectedMetric === 'revenue'"
+            (click)="selectedMetric = 'revenue'">
+            Revenue
+          </button>
+        </div>
+      </div>
+      <div class="chart-container">
+        <div #trendChart class="chart"></div>
+      </div>
+    </div>
+
+    <!-- Conversion Funnel -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>🔽 Conversion Funnel</h3>
+        <button class="btn-chart-expand">⛶</button>
+      </div>
+      <div class="chart-container">
+        <div #conversionFunnel class="chart"></div>
+      </div>
+      <div class="funnel-insights">
+        <p><strong>Drop-off Analysis:</strong></p>
+        <ul>
+          <li *ngFor="let stage of funnelData.slice(0, -1); let i = index">
+            {{stage.stage}} → {{funnelData[i+1]?.stage}}: 
+            <strong>{{stage.count - (funnelData[i+1]?.count || 0)}} leads lost</strong>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Activity Heatmap -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>🔥 Activity Heatmap</h3>
+        <button class="btn-chart-expand">⛶</button>
+      </div>
+      <div class="chart-container">
+        <div #heatmapChart class="chart"></div>
+      </div>
+      <p class="chart-subtitle">Lead activity by day and hour</p>
+    </div>
+  </div>
+
+  <!-- Detailed Stats Table -->
+  <div class="stats-table-card">
+    <div class="table-header">
+      <h3>📑 Detailed Statistics</h3>
+      <input type="text" placeholder="Search..." class="table-search">
+    </div>
+    <table class="stats-table">
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>This Week</th>
+          <th>Last Week</th>
+          <th>Change</th>
+          <th>Trend</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>New Leads</strong></td>
+          <td>{{totalLeads}}</td>
+          <td>{{totalLeads - 5}}</td>
+          <td class="positive">+{{5}}</td>
+          <td>📈</td>
+        </tr>
+        <tr>
+          <td><strong>Qualified</strong></td>
+          <td>{{qualifiedLeads}}</td>
+          <td>{{qualifiedLeads - 3}}</td>
+          <td class="positive">+{{3}}</td>
+          <td>📈</td>
+        </tr>
+        <tr>
+          <td><strong>Converted</strong></td>
+          <td>{{getConvertedCount()}}</td>
+          <td>{{getConvertedCount() - 2}}</td>
+          <td class="positive">+2</td>
+          <td>📈</td>
+        </tr>
+        <tr>
+          <td><strong>Lost</strong></td>
+          <td>{{getLostCount()}}</td>
+          <td>{{getLostCount() + 1}}</td>
+          <td class="negative">-1</td>
+          <td>📉</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Insights Section -->
+  <div class="insights-section">
+    <h3>💡 AI-Powered Insights</h3>
+    <div class="insights-grid">
+      <div class="insight-card positive">
+        <span class="insight-icon">✅</span>
+        <p><strong>Top Performing Source:</strong> Website leads have a 28% higher conversion rate than other sources.</p>
+      </div>
+      <div class="insight-card warning">
+        <span class="insight-icon">⚠️</span>
+        <p><strong>Attention Needed:</strong> Response time increased by 15% in the last week. Consider adding more agents.</p>
+      </div>
+      <div class="insight-card info">
+        <span class="insight-icon">📊</span>
+        <p><strong>Trend Alert:</strong> Friday afternoons show the highest lead activity. Optimize staffing accordingly.</p>
+      </div>
+      <div class="insight-card success">
+        <span class="insight-icon">🎯</span>
+        <p><strong>Goal Achievement:</strong> You're 87% towards your monthly target of 100 qualified leads!</p>
+      </div>
+    </div>
+  </div>
+</div>

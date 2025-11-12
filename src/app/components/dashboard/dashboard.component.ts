@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ApiService } from '../../services/api.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -6,15 +7,48 @@ import { Component } from '@angular/core';
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   Math = Math;
   
   stats = [
-    { icon: 'fas fa-building', label: 'Total Properties', value: '1,234', change: 12, color: '#8B0000' },
-    { icon: 'fas fa-users', label: 'Active Leads', value: '856', change: 8, color: '#D4AF37' },
-    { icon: 'fas fa-handshake', label: 'Closed Deals', value: '142', change: -3, color: '#B8941F' },
-    { icon: 'fas fa-dollar-sign', label: 'Revenue', value: '$2.4M', change: 15, color: '#5c0000' }
+    { icon: 'fas fa-building', label: 'Total Properties', value: '0', change: 0, color: '#8B0000' },
+    { icon: 'fas fa-users', label: 'Active Leads', value: '0', change: 0, color: '#D4AF37' },
+    { icon: 'fas fa-handshake', label: 'Closed Deals', value: '0', change: 0, color: '#B8941F' },
+    { icon: 'fas fa-dollar-sign', label: 'Revenue', value: '$0', change: 0, color: '#5c0000' }
   ];
+
+  constructor(private apiService: ApiService) {}
+
+  ngOnInit(): void {
+    this.loadDashboardData();
+  }
+
+  loadDashboardData(): void {
+    this.apiService.getDashboardStats().subscribe({
+      next: (stats) => {
+        this.stats[0].value = stats.totalProperties?.toString() || '0';
+        this.stats[1].value = stats.activeLeads?.toString() || '0';
+        this.stats[2].value = stats.closedDeals?.toString() || '0';
+        this.stats[3].value = `$${(stats.revenue / 1000000).toFixed(1)}M` || '$0';
+      },
+      error: (error) => console.error('Error loading dashboard stats:', error)
+    });
+
+    this.apiService.getRecentProperties().subscribe({
+      next: (data) => this.properties = data,
+      error: (error) => console.error('Error loading properties:', error)
+    });
+
+    this.apiService.getRecentLeads().subscribe({
+      next: (data) => this.leads = data.map(lead => ({
+        name: `${lead.firstName} ${lead.lastName}`,
+        email: lead.email,
+        status: lead.status,
+        avatar: `https://ui-avatars.com/api/?name=${lead.firstName}+${lead.lastName}&background=667eea&color=fff`
+      })),
+      error: (error) => console.error('Error loading leads:', error)
+    });
+  }
   
   properties = [
     {

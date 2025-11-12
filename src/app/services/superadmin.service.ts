@@ -215,6 +215,14 @@ export class SuperadminService {
     return this.mockTenants.find(t => t.id === id);
   }
 
+  getTenantBySlug(slug: string): TenantInstance | undefined {
+    return this.mockTenants.find(t => t.slug === slug);
+  }
+
+  getAllTenants(): TenantInstance[] {
+    return [...this.mockTenants];
+  }
+
   createTenant(tenant: Partial<TenantInstance>): TenantInstance {
     const plan = PLAN_TEMPLATES.find(p => p.id === tenant.subscriptionPlan) || PLAN_TEMPLATES[0];
     

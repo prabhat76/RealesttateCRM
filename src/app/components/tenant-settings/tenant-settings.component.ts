@@ -14,6 +14,8 @@ import { CustomField, FormTemplate, EmailTemplate } from '../../models/tenant-se
 export class TenantSettingsComponent implements OnInit {
   currentTenant: TenantInstance | null = null;
   activeTab: 'branding' | 'features' | 'customFields' | 'forms' | 'email' | 'integrations' = 'branding';
+  tabs: ('branding' | 'features' | 'customFields' | 'forms' | 'email' | 'integrations')[] = 
+    ['branding', 'features', 'customFields', 'forms', 'email', 'integrations'];
   
   // Branding
   logoFile: File | null = null;
@@ -52,6 +54,10 @@ export class TenantSettingsComponent implements OnInit {
         this.loadEmailTemplates();
       }
     });
+  }
+  
+  setActiveTab(tab: 'branding' | 'features' | 'customFields' | 'forms' | 'email' | 'integrations'): void {
+    this.activeTab = tab;
   }
   
   // ===== BRANDING =====

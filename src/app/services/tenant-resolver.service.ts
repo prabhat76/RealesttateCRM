@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { TenantInstance } from '../models/tenant.model';
+import { SuperadminService } from './superadmin.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,7 @@ export class TenantResolverService {
   private currentTenantSubject = new BehaviorSubject<TenantInstance | null>(null);
   public currentTenant$ = this.currentTenantSubject.asObservable();
 
-  constructor() {
+  constructor(private superadminService: SuperadminService) {
     this.resolveTenant();
   }
 
@@ -91,12 +92,32 @@ export class TenantResolverService {
   }
 
   private loadTenantBySlug(slug: string): TenantInstance | null {
-    // In production, this would query your API
-    // Mock data for demonstration
-    const mockTenant: TenantInstance = {
-      id: '1',
+    // First, try to get from SuperadminService (real data)
+    const tenants = this.superadminService.getAllTenants();
+    const foundTenant = tenants.find(t => 
+      t.slug === slug || 
+      t.domain === window.location.hostname ||
+      t.slug === 'demo' // Fallback for development
+    );
+
+    if (foundTenant) {
+      return foundTenant;
+    }
+
+    // Fallback to demo tenant for development
+    if (slug === 'demo' || window.location.hostname === 'localhost') {
+      return this.createDemoTenant();
+    }
+
+    return null;
+  }
+
+  private createDemoTenant(): TenantInstance {
+    // Mock demo tenant for development
+    return {
+      id: 'demo',
       name: 'Demo Real Estate',
-      slug: slug,
+      slug: 'demo',
       domain: window.location.hostname,
       status: 'active',
       subscriptionPlan: 'pro',
@@ -171,8 +192,6 @@ export class TenantResolverService {
       },
       createdAt: new Date('2024-01-15')
     };
-
-    return mockTenant;
   }
 
   private applyTenantBranding(tenant: TenantInstance): void {
@@ -271,5 +290,32 @@ export class TenantResolverService {
       allowed: remaining > 0,
       remaining: Math.max(0, remaining)
     };
+  }
+
+  /**
+   * Switch to a different tenant by slug
+   * Useful for superadmin to preview tenant instances
+   */
+  switchTenant(slug: string): boolean {
+    const tenant = this.loadTenantBySlug(slug);
+    if (tenant) {
+      this.currentTenantSubject.next(tenant);
+      this.applyTenantBranding(tenant);
+      
+      // Update URL parameter
+      const url = new URL(window.location.href);
+      url.searchParams.set('tenant', slug);
+      window.history.pushState({}, '', url.toString());
+      
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Get tenant by slug (for superadmin preview)
+   */
+  getTenantBySlug(slug: string): TenantInstance | null {
+    return this.loadTenantBySlug(slug);
   }
 }
