@@ -40,8 +40,8 @@
 
 .search-box input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #D4AF37;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
 }
 
 .header-actions {
@@ -101,7 +101,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 2px solid #667eea;
+  border: 2px solid #D4AF37;
 }
 
 .user-info {

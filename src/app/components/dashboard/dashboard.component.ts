@@ -10,10 +10,10 @@ export class DashboardComponent {
   Math = Math;
   
   stats = [
-    { icon: 'fas fa-building', label: 'Total Properties', value: '1,234', change: 12, color: '#667eea' },
-    { icon: 'fas fa-users', label: 'Active Leads', value: '856', change: 8, color: '#10b981' },
-    { icon: 'fas fa-handshake', label: 'Closed Deals', value: '142', change: -3, color: '#f59e0b' },
-    { icon: 'fas fa-dollar-sign', label: 'Revenue', value: '$2.4M', change: 15, color: '#ef4444' }
+    { icon: 'fas fa-building', label: 'Total Properties', value: '1,234', change: 12, color: '#8B0000' },
+    { icon: 'fas fa-users', label: 'Active Leads', value: '856', change: 8, color: '#D4AF37' },
+    { icon: 'fas fa-handshake', label: 'Closed Deals', value: '142', change: -3, color: '#B8941F' },
+    { icon: 'fas fa-dollar-sign', label: 'Revenue', value: '$2.4M', change: 15, color: '#5c0000' }
   ];
   
   properties = [

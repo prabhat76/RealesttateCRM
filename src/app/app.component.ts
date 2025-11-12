@@ -12,7 +12,7 @@ import { AuthService } from './services/auth.service';
     styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'Propella Real Estate CRM';
+  title = 'NOVA KEYS Real Estate CRM';
 
   constructor(
     public authService: AuthService,
