@@ -1,0 +1,239 @@
+<div class="leads-container">
+  <!-- Header with Stats -->
+  <div class="leads-header">
+    <div class="header-top">
+      <h1>Lead Management</h1>
+      <button class="btn-primary" (click)="openAddModal()">
+        <i class="fas fa-plus"></i> Add New Lead
+      </button>
+    </div>
+
+    <div class="stats-cards">
+      <div class="stat-card">
+        <i class="fas fa-users"></i>
+        <div class="stat-info">
+          <h3>{{leadStats.total}}</h3>
+          <p>Total Leads</p>
+        </div>
+      </div>
+      <div class="stat-card stat-new">
+        <i class="fas fa-star"></i>
+        <div class="stat-info">
+          <h3>{{leadStats.new}}</h3>
+          <p>New</p>
+        </div>
+      </div>
+      <div class="stat-card stat-qualified">
+        <i class="fas fa-check-circle"></i>
+        <div class="stat-info">
+          <h3>{{leadStats.qualified}}</h3>
+          <p>Qualified</p>
+        </div>
+      </div>
+      <div class="stat-card stat-converted">
+        <i class="fas fa-trophy"></i>
+        <div class="stat-info">
+          <h3>{{leadStats.conversionRate}}%</h3>
+          <p>Conversion Rate</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input 
+        type="text" 
+        placeholder="Search leads by name, email, or phone..." 
+        [(ngModel)]="searchQuery"
+        (input)="applyFilters()"
+      />
+    </div>
+
+    <div class="filter-group">
+      <select [(ngModel)]="filterStatus" (change)="applyFilters()">
+        <option value="all">All Status</option>
+        <option value="new">New</option>
+        <option value="contacted">Contacted</option>
+        <option value="qualified">Qualified</option>
+        <option value="unqualified">Unqualified</option>
+        <option value="converted">Converted</option>
+      </select>
+
+      <select [(ngModel)]="filterType" (change)="applyFilters()">
+        <option value="all">All Types</option>
+        <option value="buyer">Buyer</option>
+        <option value="seller">Seller</option>
+        <option value="both">Both</option>
+      </select>
+
+      <select [(ngModel)]="sortBy" (change)="applyFilters()">
+        <option value="createdAt">Newest First</option>
+        <option value="score">Highest Score</option>
+        <option value="name">Name (A-Z)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Leads List -->
+  <div class="leads-list">
+    <div class="lead-card" *ngFor="let lead of filteredLeads">
+      <div class="lead-header-row">
+        <div class="lead-info">
+          <h3>{{lead.firstName}} {{lead.lastName}}</h3>
+          <span class="lead-type" [class.type-buyer]="lead.type === 'buyer'" 
+                [class.type-seller]="lead.type === 'seller'">
+            <i class="fas" [class.fa-shopping-cart]="lead.type === 'buyer'" 
+               [class.fa-tag]="lead.type === 'seller'"
+               [class.fa-exchange-alt]="lead.type === 'both'"></i>
+            {{lead.type}}
+          </span>
+          <span class="lead-score" [ngClass]="getScoreClass(lead.score)">
+            {{lead.score}} pts
+          </span>
+        </div>
+        <div class="lead-actions">
+          <select 
+            class="status-select" 
+            [ngClass]="getStatusClass(lead.status)"
+            [(ngModel)]="lead.status"
+            (change)="updateLeadStatus(lead.id, lead.status)"
+          >
+            <option value="new">New</option>
+            <option value="contacted">Contacted</option>
+            <option value="qualified">Qualified</option>
+            <option value="unqualified">Unqualified</option>
+            <option value="converted">Converted</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="lead-details">
+        <div class="detail-item">
+          <i class="fas fa-envelope"></i>
+          <span>{{lead.email}}</span>
+        </div>
+        <div class="detail-item">
+          <i class="fas fa-phone"></i>
+          <span>{{lead.phone}}</span>
+        </div>
+        <div class="detail-item" *ngIf="lead.budget">
+          <i class="fas fa-dollar-sign"></i>
+          <span>Budget: ${{lead.budget.toLocaleString()}}</span>
+        </div>
+        <div class="detail-item">
+          <i class="fas fa-calendar"></i>
+          <span>{{lead.createdAt | date: 'MMM d, y'}}</span>
+        </div>
+      </div>
+
+      <div class="lead-interested" *ngIf="lead.interestedIn">
+        <i class="fas fa-info-circle"></i>
+        <span>{{lead.interestedIn}}</span>
+      </div>
+
+      <div class="lead-footer">
+        <div class="lead-source">
+          Source: <strong>{{lead.source}}</strong>
+        </div>
+        <div class="lead-buttons">
+          <button class="btn-secondary" (click)="viewLead(lead.id)">
+            <i class="fas fa-eye"></i> View
+          </button>
+          <button class="btn-success" (click)="convertLead(lead.id)" 
+                  *ngIf="lead.status === 'qualified'">
+            <i class="fas fa-check"></i> Convert
+          </button>
+          <button class="btn-danger" (click)="deleteLead(lead.id)">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="filteredLeads.length === 0">
+      <i class="fas fa-users fa-3x"></i>
+      <h3>No leads found</h3>
+      <p>Try adjusting your filters or add a new lead</p>
+    </div>
+  </div>
+</div>
+
+<!-- Add Lead Modal -->
+<div class="modal" *ngIf="showAddModal" (click)="closeAddModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Add New Lead</h2>
+      <button class="close-btn" (click)="closeAddModal()">×</button>
+    </div>
+
+    <form (ngSubmit)="createLead()">
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name *</label>
+          <input type="text" [(ngModel)]="newLead.firstName" name="firstName" required>
+        </div>
+        <div class="form-group">
+          <label>Last Name *</label>
+          <input type="text" [(ngModel)]="newLead.lastName" name="lastName" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Email *</label>
+          <input type="email" [(ngModel)]="newLead.email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label>Phone *</label>
+          <input type="tel" [(ngModel)]="newLead.phone" name="phone" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Type *</label>
+          <select [(ngModel)]="newLead.type" name="type" required>
+            <option value="buyer">Buyer</option>
+            <option value="seller">Seller</option>
+            <option value="both">Both</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Source *</label>
+          <select [(ngModel)]="newLead.source" name="source" required>
+            <option value="website">Website</option>
+            <option value="referral">Referral</option>
+            <option value="social">Social Media</option>
+            <option value="advertisement">Advertisement</option>
+            <option value="walk-in">Walk-in</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group" *ngIf="newLead.type === 'buyer' || newLead.type === 'both'">
+        <label>Budget</label>
+        <input type="number" [(ngModel)]="newLead.budget" name="budget" placeholder="e.g., 500000">
+      </div>
+
+      <div class="form-group">
+        <label>Interested In</label>
+        <textarea [(ngModel)]="newLead.interestedIn" name="interestedIn" rows="3" 
+                  placeholder="What are they looking for?"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Notes</label>
+        <textarea [(ngModel)]="newLead.notes" name="notes" rows="3"></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="closeAddModal()">Cancel</button>
+        <button type="submit" class="btn-primary">Add Lead</button>
+      </div>
+    </form>
+  </div>
+</div>

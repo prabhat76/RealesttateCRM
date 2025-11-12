@@ -21,9 +21,10 @@
   margin-bottom: 30px;
 }
 
-.logo-icon {
-  font-size: 64px;
-  margin-bottom: 15px;
+.logo {
+  width: 150px;
+  height: auto;
+  margin-bottom: 20px;
   filter: drop-shadow(0 4px 8px rgba(212, 175, 55, 0.3));
 }
 

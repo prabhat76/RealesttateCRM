@@ -1,0 +1,404 @@
+<div class="superadmin-container">
+  <!-- Header -->
+  <div class="superadmin-header">
+    <div class="header-top">
+      <div>
+        <h1>🔐 Superadmin Dashboard</h1>
+        <p class="subtitle">Manage all tenant instances and platform settings</p>
+      </div>
+      <button class="btn-create" (click)="openCreateModal()">
+        <i class="fas fa-plus-circle"></i> Create New Tenant
+      </button>
+    </div>
+
+    <!-- Platform Stats -->
+    <div class="stats-grid" *ngIf="platformStats">
+      <div class="stat-card stat-primary">
+        <div class="stat-icon"><i class="fas fa-building"></i></div>
+        <div class="stat-content">
+          <h3>{{platformStats.totalTenants}}</h3>
+          <p>Total Tenants</p>
+          <span class="stat-sub">{{platformStats.activeTenants}} active</span>
+        </div>
+      </div>
+
+      <div class="stat-card stat-success">
+        <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+        <div class="stat-content">
+          <h3>{{formatCurrency(platformStats.monthlyRevenue)}}</h3>
+          <p>Monthly Revenue</p>
+          <span class="stat-sub">{{formatCurrency(platformStats.totalRevenue)}} /year</span>
+        </div>
+      </div>
+
+      <div class="stat-card stat-info">
+        <div class="stat-icon"><i class="fas fa-users"></i></div>
+        <div class="stat-content">
+          <h3>{{platformStats.totalUsers}}</h3>
+          <p>Total Users</p>
+          <span class="stat-sub">Across all tenants</span>
+        </div>
+      </div>
+
+      <div class="stat-card stat-warning">
+        <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+        <div class="stat-content">
+          <h3>+{{platformStats.growthRate}}%</h3>
+          <p>Growth Rate</p>
+          <span class="stat-sub">{{platformStats.recentSignups}} new this month</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plan Distribution -->
+    <div class="plan-distribution" *ngIf="platformStats">
+      <h3>Tenants by Plan</h3>
+      <div class="plan-bars">
+        <div class="plan-bar">
+          <span class="plan-label">Free</span>
+          <div class="bar-container">
+            <div class="bar bar-free" [style.width.%]="(platformStats.tenantsByPlan.free / platformStats.totalTenants) * 100"></div>
+          </div>
+          <span class="plan-count">{{platformStats.tenantsByPlan.free}}</span>
+        </div>
+        <div class="plan-bar">
+          <span class="plan-label">Basic</span>
+          <div class="bar-container">
+            <div class="bar bar-basic" [style.width.%]="(platformStats.tenantsByPlan.basic / platformStats.totalTenants) * 100"></div>
+          </div>
+          <span class="plan-count">{{platformStats.tenantsByPlan.basic}}</span>
+        </div>
+        <div class="plan-bar">
+          <span class="plan-label">Pro</span>
+          <div class="bar-container">
+            <div class="bar bar-pro" [style.width.%]="platformStats && platformStats.tenantsByPlan ? (platformStats.tenantsByPlan.pro / platformStats.totalTenants) * 100 : 0"></div>
+          </div>
+          <span class="plan-count">{{platformStats && platformStats.tenantsByPlan ? platformStats.tenantsByPlan.pro : 0}}</span>
+        </div>
+        <div class="plan-bar">
+          <span class="plan-label">Enterprise</span>
+          <div class="bar-container">
+            <div class="bar bar-enterprise" [style.width.%]="platformStats && platformStats.tenantsByPlan ? (platformStats.tenantsByPlan.enterprise / platformStats.totalTenants) * 100 : 0"></div>
+          </div>
+          <span class="plan-count">{{platformStats && platformStats.tenantsByPlan ? platformStats.tenantsByPlan.enterprise : 0}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input 
+        type="text" 
+        placeholder="Search tenants by name, email, or slug..." 
+        [(ngModel)]="searchQuery"
+        (input)="applyFilters()"
+      />
+    </div>
+
+    <div class="filter-group">
+      <select [(ngModel)]="filterStatus" (change)="applyFilters()">
+        <option value="all">All Status</option>
+        <option value="active">Active</option>
+        <option value="trial">Trial</option>
+        <option value="suspended">Suspended</option>
+        <option value="expired">Expired</option>
+      </select>
+
+      <select [(ngModel)]="filterPlan" (change)="applyFilters()">
+        <option value="all">All Plans</option>
+        <option value="free">Free</option>
+        <option value="basic">Basic</option>
+        <option value="pro">Pro</option>
+        <option value="enterprise">Enterprise</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Tenants List -->
+  <div class="tenants-list">
+    <div class="tenant-card" 
+         *ngFor="let tenant of filteredTenants" 
+         (click)="viewTenant(tenant)"
+         [style.--tenant-color]="tenant.branding.primaryColor"
+         [style.--tenant-color-dark]="adjustColor(tenant.branding.primaryColor, -30)">
+      <div class="tenant-header">
+        <div class="tenant-info">
+          <div class="tenant-logo" *ngIf="tenant.branding.logo">
+            <img [src]="tenant.branding.logo" [alt]="tenant.name">
+          </div>
+          <div class="tenant-logo-placeholder" *ngIf="!tenant.branding.logo">
+            {{tenant.name.charAt(0)}}
+          </div>
+          <div>
+            <h3>{{tenant.name}}</h3>
+            <p class="tenant-slug">{{tenant.slug}}.yourplatform.com</p>
+          </div>
+        </div>
+        
+        <div class="tenant-badges">
+          <span class="badge" [ngClass]="getStatusClass(tenant.status)">{{tenant.status}}</span>
+          <span class="badge" [ngClass]="getPlanClass(tenant.subscriptionPlan)">{{tenant.subscriptionPlan}}</span>
+        </div>
+      </div>
+
+      <div class="tenant-details">
+        <div class="detail-row">
+          <div class="detail-item">
+            <i class="fas fa-user"></i>
+            <span>{{tenant.ownerName}}</span>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-envelope"></i>
+            <span>{{tenant.ownerEmail}}</span>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-calendar"></i>
+            <span>Created {{tenant.createdAt | date: 'MMM d, y'}}</span>
+          </div>
+        </div>
+
+        <div class="usage-row">
+          <div class="usage-item">
+            <span class="usage-label">Users</span>
+            <div class="usage-bar">
+              <div class="usage-fill" [style.width.%]="getUsagePercentage(tenant.usage.currentUsers, tenant.limits.maxUsers)"
+                   [class.usage-over]="isOverLimit(tenant.usage.currentUsers, tenant.limits.maxUsers)"></div>
+            </div>
+            <span class="usage-value">{{tenant.usage.currentUsers}} / {{tenant.limits.maxUsers === -1 ? '∞' : tenant.limits.maxUsers}}</span>
+          </div>
+          <div class="usage-item">
+            <span class="usage-label">Leads</span>
+            <div class="usage-bar">
+              <div class="usage-fill" [style.width.%]="getUsagePercentage(tenant.usage.currentLeads, tenant.limits.maxLeads)"
+                   [class.usage-over]="isOverLimit(tenant.usage.currentLeads, tenant.limits.maxLeads)"></div>
+            </div>
+            <span class="usage-value">{{tenant.usage.currentLeads}} / {{tenant.limits.maxLeads === -1 ? '∞' : tenant.limits.maxLeads}}</span>
+          </div>
+          <div class="usage-item">
+            <span class="usage-label">Storage</span>
+            <div class="usage-bar">
+              <div class="usage-fill" [style.width.%]="getUsagePercentage(tenant.usage.currentStorage, tenant.limits.maxStorage)"
+                   [class.usage-over]="isOverLimit(tenant.usage.currentStorage, tenant.limits.maxStorage)"></div>
+            </div>
+            <span class="usage-value">{{tenant.usage.currentStorage}} / {{tenant.limits.maxStorage === -1 ? '∞' : tenant.limits.maxStorage}} MB</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tenant-footer">
+        <div class="tenant-revenue">
+          <span class="revenue-label">Monthly Revenue:</span>
+          <span class="revenue-amount">{{formatCurrency(tenant.monthlyRevenue)}}</span>
+        </div>
+        <div class="tenant-actions" (click)="$event.stopPropagation()">
+          <button class="btn-sm btn-success" *ngIf="tenant.status === 'suspended'" (click)="activateTenant(tenant.id)">
+            <i class="fas fa-play"></i> Activate
+          </button>
+          <button class="btn-sm btn-warning" *ngIf="tenant.status === 'active'" (click)="suspendTenant(tenant.id)">
+            <i class="fas fa-pause"></i> Suspend
+          </button>
+          <button class="btn-sm btn-info">
+            <i class="fas fa-eye"></i> View
+          </button>
+        </div>
+      </div>
+
+      <div class="trial-warning" *ngIf="tenant.status === 'trial'">
+        <i class="fas fa-clock"></i>
+        Trial ends in {{getDaysUntilTrialEnd(tenant)}} days
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="filteredTenants.length === 0">
+      <i class="fas fa-building fa-3x"></i>
+      <h3>No tenants found</h3>
+      <p>Try adjusting your filters or create a new tenant</p>
+    </div>
+  </div>
+</div>
+
+<!-- Create Tenant Modal -->
+<div class="modal" *ngIf="showCreateModal" (click)="closeCreateModal()">
+  <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Create New Tenant Instance</h2>
+      <button class="close-btn" (click)="closeCreateModal()">×</button>
+    </div>
+
+    <form (ngSubmit)="createTenant()">
+      <div class="form-section">
+        <h3>Company Information</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Company Name *</label>
+            <input type="text" [(ngModel)]="newTenant.name" name="name" required placeholder="ACME Realty">
+          </div>
+          <div class="form-group">
+            <label>Slug (subdomain) *</label>
+            <input type="text" [(ngModel)]="newTenant.slug" name="slug" placeholder="acmerealty">
+            <small>Will be: {{newTenant.slug || 'slug'}}.yourplatform.com</small>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Custom Domain (optional)</label>
+          <input type="text" [(ngModel)]="newTenant.domain" name="domain" placeholder="realty.com">
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Owner Information</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Owner Name *</label>
+            <input type="text" [(ngModel)]="newTenant.ownerName" name="ownerName" required placeholder="John Doe">
+          </div>
+          <div class="form-group">
+            <label>Owner Email *</label>
+            <input type="email" [(ngModel)]="newTenant.ownerEmail" name="ownerEmail" required placeholder="john@acmerealty.com">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Owner Phone</label>
+            <input type="tel" [(ngModel)]="newTenant.ownerPhone" name="ownerPhone" placeholder="+1-555-0100">
+          </div>
+          <div class="form-group">
+            <label>Contact Email</label>
+            <input type="email" [(ngModel)]="newTenant.contactEmail" name="contactEmail" placeholder="support@acmerealty.com">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Subscription Plan</h3>
+        <div class="plans-grid">
+          <div class="plan-option" *ngFor="let plan of plans" 
+               [class.selected]="newTenant.subscriptionPlan === plan.id"
+               (click)="selectPlan(plan.id)">
+            <div class="plan-name">{{plan.name}}</div>
+            <div class="plan-price">{{formatCurrency(plan.price)}}/mo</div>
+            <div class="plan-features">
+              <div class="feature-item" *ngIf="plan.limits.maxUsers !== -1">
+                Up to {{plan.limits.maxUsers}} users
+              </div>
+              <div class="feature-item" *ngIf="plan.limits.maxUsers === -1">
+                Unlimited users
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Branding</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Primary Color</label>
+            <input type="color" [(ngModel)]="newTenant.branding!.primaryColor" name="primaryColor">
+          </div>
+          <div class="form-group">
+            <label>Secondary Color</label>
+            <input type="color" [(ngModel)]="newTenant.branding!.secondaryColor" name="secondaryColor">
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="closeCreateModal()">Cancel</button>
+        <button type="submit" class="btn-primary">Create Tenant (14-day trial)</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Tenant Details Modal -->
+<div class="modal" *ngIf="showTenantDetails" (click)="closeTenantDetails()">
+  <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+    <div class="modal-header" *ngIf="showTenantDetails">
+      <h2>{{showTenantDetails.name}}</h2>
+      <button class="close-btn" (click)="closeTenantDetails()">×</button>
+    </div>
+
+    <div class="tenant-details-content" *ngIf="showTenantDetails">
+      <!-- Feature Management -->
+      <div class="details-section">
+        <h3>Enabled Features</h3>
+        <div class="features-grid">
+          <div class="feature-toggle">
+            <label class="switch">
+              <input type="checkbox" 
+                     [checked]="showTenantDetails.enabledFeatures.leads"
+                     (change)="toggleFeature(showTenantDetails, 'leads')">
+              <span class="slider"></span>
+            </label>
+            <span class="feature-name">Leads</span>
+          </div>
+          <div class="feature-toggle">
+            <label class="switch">
+              <input type="checkbox" 
+                     [checked]="showTenantDetails.enabledFeatures.contacts"
+                     (change)="toggleFeature(showTenantDetails, 'contacts')">
+              <span class="slider"></span>
+            </label>
+            <span class="feature-name">Contacts</span>
+          </div>
+          <div class="feature-toggle">
+            <label class="switch">
+              <input type="checkbox" 
+                     [checked]="showTenantDetails.enabledFeatures.deals"
+                     (change)="toggleFeature(showTenantDetails, 'deals')">
+              <span class="slider"></span>
+            </label>
+            <span class="feature-name">Deals</span>
+          </div>
+          <div class="feature-toggle">
+            <label class="switch">
+              <input type="checkbox" 
+                     [checked]="showTenantDetails.enabledFeatures.analytics"
+                     (change)="toggleFeature(showTenantDetails, 'analytics')">
+              <span class="slider"></span>
+            </label>
+            <span class="feature-name">Analytics</span>
+          </div>
+          <div class="feature-toggle">
+            <label class="switch">
+              <input type="checkbox" 
+                     [checked]="showTenantDetails.enabledFeatures.apiAccess"
+                     (change)="toggleFeature(showTenantDetails, 'apiAccess')">
+              <span class="slider"></span>
+            </label>
+            <span class="feature-name">API Access</span>
+          </div>
+          <div class="feature-toggle">
+            <label class="switch">
+              <input type="checkbox" 
+                     [checked]="showTenantDetails.enabledFeatures.whiteLabel"
+                     (change)="toggleFeature(showTenantDetails, 'whiteLabel')">
+              <span class="slider"></span>
+            </label>
+            <span class="feature-name">White Label</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="details-section">
+        <h3>Actions</h3>
+        <div class="action-buttons">
+          <button class="btn-warning" *ngIf="showTenantDetails.status === 'active'" (click)="suspendTenant(showTenantDetails.id)">
+            <i class="fas fa-pause"></i> Suspend Tenant
+          </button>
+          <button class="btn-success" *ngIf="showTenantDetails.status === 'suspended'" (click)="activateTenant(showTenantDetails.id)">
+            <i class="fas fa-play"></i> Activate Tenant
+          </button>
+          <button class="btn-danger" (click)="deleteTenant(showTenantDetails.id)">
+            <i class="fas fa-trash"></i> Delete Tenant
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

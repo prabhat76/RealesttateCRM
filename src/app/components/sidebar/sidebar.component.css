@@ -14,10 +14,11 @@
   text-align: center;
 }
 
-.logo-icon {
-  font-size: 48px;
-  margin-bottom: 10px;
-  filter: drop-shadow(0 2px 4px rgba(212, 175, 55, 0.5));
+.logo-image {
+  width: 120px;
+  height: auto;
+  margin-bottom: 15px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
 
 .logo h2 {
@@ -39,6 +40,16 @@
 
 .nav-menu {
   padding: 0 12px;
+}
+
+.nav-section-title {
+  color: #D4AF37;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 20px 16px 8px;
+  margin-top: 10px;
 }
 
 .nav-item {

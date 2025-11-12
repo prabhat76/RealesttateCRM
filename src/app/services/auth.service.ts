@@ -13,6 +13,16 @@ export class AuthService {
   // Mock users database
   private mockUsers: User[] = [
     {
+      id: '0',
+      email: 'superadmin@novakeys.com',
+      firstName: 'Super',
+      lastName: 'Admin',
+      role: 'admin',
+      organizationRole: 'owner',
+      phone: '555-0000',
+      permissions: ['*'] // All permissions
+    },
+    {
       id: '1',
       email: 'admin@crm.com',
       firstName: 'Admin',
@@ -49,7 +59,12 @@ export class AuthService {
       map(() => {
         const user = this.mockUsers.find(u => u.email === credentials.email);
         
-        if (user && credentials.password === 'password123') {
+        // Check password - in production, this would be done server-side with hashing
+        const validPassword = 
+          (credentials.email === 'superadmin@novakeys.com' && credentials.password === 'admin123') ||
+          (credentials.email !== 'superadmin@novakeys.com' && credentials.password === 'password123');
+        
+        if (user && validPassword) {
           localStorage.setItem('currentUser', JSON.stringify(user));
           this.currentUserSubject.next(user);
           return user;

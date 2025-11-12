@@ -38,8 +38,13 @@ export class LoginComponent {
     this.loading = true;
 
     this.authService.login(this.credentials).subscribe({
-      next: () => {
-        this.router.navigate([this.returnUrl]);
+      next: (user) => {
+        // Redirect superadmin to superadmin dashboard
+        if (user.email === 'superadmin@novakeys.com' || user.organizationRole === 'owner' && user.permissions?.includes('*')) {
+          this.router.navigate(['/superadmin']);
+        } else {
+          this.router.navigate([this.returnUrl]);
+        }
       },
       error: (err) => {
         this.error = err.message || 'Login failed. Please try again.';

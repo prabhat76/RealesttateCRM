@@ -3,9 +3,12 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
-  role: 'agent' | 'buyer' | 'seller' | 'admin';
+  role: 'owner' | 'admin' | 'agent' | 'viewer' | 'buyer' | 'seller';
   phone?: string;
   avatar?: string;
+  organizationId?: string;
+  organizationRole?: 'owner' | 'admin' | 'agent' | 'viewer';
+  permissions?: string[];
 }
 
 export interface LoginRequest {
@@ -20,4 +23,6 @@ export interface RegisterRequest {
   lastName: string;
   phone?: string;
   role: 'agent' | 'buyer' | 'seller';
+  organizationName?: string;
+  organizationType?: 'agency' | 'brokerage' | 'individual';
 }

@@ -1,0 +1,273 @@
+<div class="tenant-settings">
+  <div class="settings-header">
+    <h1>⚙️ Tenant Settings</h1>
+    <p *ngIf="currentTenant">Configure your CRM instance: <strong>{{currentTenant.branding.companyName}}</strong></p>
+  </div>
+  
+  <div class="settings-tabs">
+    <button 
+      *ngFor="let tab of ['branding', 'features', 'customFields', 'forms', 'email', 'integrations']"
+      [class.active]="activeTab === tab"
+      (click)="activeTab = tab">
+      {{tab | titlecase}}
+    </button>
+  </div>
+  
+  <!-- BRANDING TAB -->
+  <div class="tab-content" *ngIf="activeTab === 'branding' && currentTenant">
+    <div class="settings-section">
+      <h2>🎨 Branding & Appearance</h2>
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Company Name</label>
+          <input type="text" [(ngModel)]="currentTenant.branding.companyName" placeholder="Your Company Name">
+        </div>
+        
+        <div class="form-group">
+          <label>Primary Color</label>
+          <div class="color-picker-group">
+            <input type="color" [(ngModel)]="currentTenant.branding.primaryColor">
+            <input type="text" [(ngModel)]="currentTenant.branding.primaryColor" placeholder="#8B0000">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>Secondary Color</label>
+          <div class="color-picker-group">
+            <input type="color" [(ngModel)]="currentTenant.branding.secondaryColor">
+            <input type="text" [(ngModel)]="currentTenant.branding.secondaryColor" placeholder="#D4AF37">
+          </div>
+        </div>
+        
+        <div class="form-group full-width">
+          <label>Logo</label>
+          <div class="file-upload">
+            <input type="file" id="logo" accept="image/*" (change)="onLogoSelected($event)" hidden>
+            <label for="logo" class="upload-btn">Choose Logo</label>
+            <img *ngIf="logoPreview" [src]="logoPreview" class="preview-image" alt="Logo preview">
+            <img *ngIf="!logoPreview && currentTenant.branding.logo" [src]="currentTenant.branding.logo" class="preview-image" alt="Current logo">
+          </div>
+        </div>
+        
+        <div class="form-group full-width">
+          <label>Favicon (16x16 or 32x32)</label>
+          <div class="file-upload">
+            <input type="file" id="favicon" accept="image/x-icon,image/png" (change)="onFaviconSelected($event)" hidden>
+            <label for="favicon" class="upload-btn">Choose Favicon</label>
+            <img *ngIf="faviconPreview" [src]="faviconPreview" class="favicon-preview" alt="Favicon preview">
+            <img *ngIf="!faviconPreview && currentTenant.branding.favicon" [src]="currentTenant.branding.favicon" class="favicon-preview" alt="Current favicon">
+          </div>
+        </div>
+        
+        <div class="form-group full-width">
+          <label>Custom CSS (Advanced)</label>
+          <textarea [(ngModel)]="currentTenant.branding.customCSS" rows="6" placeholder=".button { background: red; }"></textarea>
+          <small>Add custom CSS to override default styles</small>
+        </div>
+      </div>
+      
+      <button class="btn-save" (click)="saveBranding()">💾 Save Branding</button>
+    </div>
+  </div>
+  
+  <!-- FEATURES TAB -->
+  <div class="tab-content" *ngIf="activeTab === 'features' && currentTenant">
+    <div class="settings-section">
+      <h2>🎯 Features & Modules</h2>
+      <p>Enable or disable features for your CRM instance</p>
+      
+      <div *ngFor="let category of getCategories()" class="feature-category">
+        <h3>{{category}}</h3>
+        <div class="feature-grid">
+          <div *ngFor="let feature of getFeaturesByCategory(category)" class="feature-item">
+            <label class="toggle-switch">
+              <input 
+                type="checkbox" 
+                [checked]="currentTenant.enabledFeatures[feature.key]"
+                (change)="toggleFeature(feature.key)">
+              <span class="toggle-slider"></span>
+            </label>
+            <div class="feature-info">
+              <strong>{{feature.label}}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <button class="btn-save" (click)="saveFeatures()">💾 Save Features</button>
+    </div>
+  </div>
+  
+  <!-- CUSTOM FIELDS TAB -->
+  <div class="tab-content" *ngIf="activeTab === 'customFields'">
+    <div class="settings-section">
+      <div class="section-header">
+        <h2>📝 Custom Fields</h2>
+        <button class="btn-add" (click)="openCustomFieldModal()">+ Add Field</button>
+      </div>
+      
+      <div class="custom-fields-list">
+        <div *ngFor="let field of customFields" class="field-card">
+          <div class="field-header">
+            <div>
+              <strong>{{field.label}}</strong>
+              <span class="field-badge">{{field.entityType}}</span>
+              <span class="field-badge">{{field.type}}</span>
+            </div>
+            <div class="field-actions">
+              <button (click)="openCustomFieldModal(field)" class="btn-icon">✏️</button>
+              <button (click)="deleteCustomField(field.id)" class="btn-icon">🗑️</button>
+            </div>
+          </div>
+          <p><code>{{field.name}}</code> - {{field.required ? 'Required' : 'Optional'}}</p>
+        </div>
+        
+        <div *ngIf="customFields.length === 0" class="empty-state">
+          <p>No custom fields yet. Click "Add Field" to create one.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- EMAIL TEMPLATES TAB -->
+  <div class="tab-content" *ngIf="activeTab === 'email'">
+    <div class="settings-section">
+      <div class="section-header">
+        <h2>📧 Email Templates</h2>
+        <button class="btn-add" (click)="showEmailModal = true">+ Add Template</button>
+      </div>
+      
+      <div class="templates-list">
+        <div *ngFor="let template of emailTemplates" class="template-card">
+          <div class="template-header">
+            <div>
+              <strong>{{template.name}}</strong>
+              <span class="badge" [class.active]="template.active">{{template.active ? 'Active' : 'Inactive'}}</span>
+            </div>
+            <button class="btn-icon">✏️</button>
+          </div>
+          <p><strong>Subject:</strong> {{template.subject}}</p>
+          <small>Variables: {{template.variables.join(', ')}}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- INTEGRATIONS TAB -->
+  <div class="tab-content" *ngIf="activeTab === 'integrations' && currentTenant">
+    <div class="settings-section">
+      <h2>🔌 Integrations & API</h2>
+      
+      <div class="integration-card">
+        <h3>API Access</h3>
+        <div class="form-group">
+          <label>API Key</label>
+          <div class="api-key-display">
+            <code>{{currentTenant.apiKey || 'Not generated'}}</code>
+            <button class="btn-small">Generate New</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="integration-card">
+        <h3>Webhook URL</h3>
+        <div class="form-group">
+          <label>Webhook Endpoint</label>
+          <input type="url" [(ngModel)]="currentTenant.webhookUrl" placeholder="https://your-domain.com/webhook">
+          <small>Receive real-time notifications for events</small>
+        </div>
+      </div>
+      
+      <div class="integration-card">
+        <h3>Email Settings</h3>
+        <div class="form-group">
+          <label>Email Provider</label>
+          <select [(ngModel)]="currentTenant.settings!.emailProvider">
+            <option value="smtp">SMTP</option>
+            <option value="sendgrid">SendGrid</option>
+            <option value="mailgun">Mailgun</option>
+            <option value="ses">AWS SES</option>
+          </select>
+        </div>
+      </div>
+      
+      <button class="btn-save">💾 Save Integration Settings</button>
+    </div>
+  </div>
+</div>
+
+<!-- Custom Field Modal -->
+<div class="modal" *ngIf="showCustomFieldModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>{{editingField ? 'Edit' : 'Add'}} Custom Field</h2>
+      <button class="modal-close" (click)="showCustomFieldModal = false">×</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Field Name *</label>
+        <input type="text" [(ngModel)]="newField.name" placeholder="e.g., property_size">
+      </div>
+      
+      <div class="form-group">
+        <label>Label *</label>
+        <input type="text" [(ngModel)]="newField.label" placeholder="e.g., Property Size">
+      </div>
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Entity Type *</label>
+          <select [(ngModel)]="newField.entityType">
+            <option value="lead">Lead</option>
+            <option value="contact">Contact</option>
+            <option value="deal">Deal</option>
+            <option value="property">Property</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Field Type *</label>
+          <select [(ngModel)]="newField.type">
+            <option value="text">Text</option>
+            <option value="number">Number</option>
+            <option value="email">Email</option>
+            <option value="phone">Phone</option>
+            <option value="date">Date</option>
+            <option value="select">Select</option>
+            <option value="textarea">Textarea</option>
+            <option value="checkbox">Checkbox</option>
+            <option value="url">URL</option>
+            <option value="currency">Currency</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-group" *ngIf="newField.type === 'select'">
+        <label>Options (comma-separated)</label>
+        <input type="text" [(ngModel)]="newField.options" placeholder="Option 1, Option 2, Option 3">
+      </div>
+      
+      <div class="checkbox-group">
+        <label>
+          <input type="checkbox" [(ngModel)]="newField.required">
+          Required Field
+        </label>
+        <label>
+          <input type="checkbox" [(ngModel)]="newField.showInList">
+          Show in List View
+        </label>
+        <label>
+          <input type="checkbox" [(ngModel)]="newField.showInDetail">
+          Show in Detail View
+        </label>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="showCustomFieldModal = false">Cancel</button>
+      <button class="btn-save" (click)="saveCustomField()">Save Field</button>
+    </div>
+  </div>
+</div>

@@ -1,12 +1,6 @@
 <div class="sidebar">
   <div class="logo">
-    <div class="logo-house">
-      <div class="house-left"></div>
-      <div class="house-right"></div>
-      <div class="house-key">
-        <div class="key-circle"></div>
-      </div>
-    </div>
+    <img src="assets/image.png" alt="NOVA KEYS Logo" class="logo-image">
     <h2>NOVA KEYS</h2>
     <p class="logo-subtitle">Real Estate</p>
   </div>
@@ -20,6 +14,32 @@
       <i class="fas fa-home"></i>
       <span>Dashboard</span>
     </div>
+    
+    <!-- Superadmin Section (only for superadmin) -->
+    <div class="nav-section-title" *ngIf="isSuperadmin()">Platform</div>
+    
+    <div 
+      class="nav-item" 
+      *ngIf="isSuperadmin()"
+      [class.active]="isActive('/superadmin')"
+      (click)="navigate('/superadmin')"
+    >
+      <i class="fas fa-crown"></i>
+      <span>Superadmin</span>
+    </div>
+    
+    <div class="nav-section-title">CRM</div>
+    
+    <div 
+      class="nav-item" 
+      [class.active]="isActive('/leads')"
+      (click)="navigate('/leads')"
+    >
+      <i class="fas fa-user-plus"></i>
+      <span>Leads</span>
+    </div>
+    
+    <div class="nav-section-title">Properties</div>
     
     <div 
       class="nav-item" 
@@ -46,6 +66,17 @@
     >
       <i class="fas fa-calculator"></i>
       <span>Mortgage</span>
+    </div>
+    
+    <div class="nav-section-title">Settings</div>
+    
+    <div 
+      class="nav-item" 
+      [class.active]="isActive('/settings')"
+      (click)="navigate('/settings')"
+    >
+      <i class="fas fa-cog"></i>
+      <span>Tenant Settings</span>
     </div>
     
     <div class="nav-divider"></div>
